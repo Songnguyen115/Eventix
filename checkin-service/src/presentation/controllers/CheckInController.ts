@@ -12,18 +12,14 @@ export class CheckInController {
 
   async checkInAttendee(req: Request, res: Response): Promise<void> {
     try {
-      const { qrCode, eventId, location } = req.body;
-      const checkedInBy = req.user?.id; // From JWT middleware
-
-      if (!checkedInBy) {
-        res.status(401).json({ error: 'Unauthorized' });
-        return;
-      }
+      const { qrCode, eventId, location, checkedInBy } = req.body;
+      // For demo mode, use checkedInBy from request body or fallback to user from JWT
+      const finalCheckedInBy = checkedInBy || req.user?.id || 'demo-admin';
 
       const result = await this.checkInAttendeeUseCase.execute({
         qrCode,
         eventId,
-        checkedInBy,
+        checkedInBy: finalCheckedInBy,
         location
       });
 

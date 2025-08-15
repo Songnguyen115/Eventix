@@ -191,6 +191,16 @@ export class MySQLAttendeeRepository implements IAttendeeRepository {
   }
 
   private mapRowToAttendee(row: any): Attendee {
+    let sponsorBoothVisits = [];
+    try {
+      if (row.sponsor_booth_visits && row.sponsor_booth_visits.trim() !== '') {
+        sponsorBoothVisits = JSON.parse(row.sponsor_booth_visits);
+      }
+    } catch (error) {
+      console.warn('Failed to parse sponsor_booth_visits JSON:', row.sponsor_booth_visits);
+      sponsorBoothVisits = [];
+    }
+
     return {
       id: row.id,
       eventId: row.event_id,
@@ -200,7 +210,7 @@ export class MySQLAttendeeRepository implements IAttendeeRepository {
       checkOutTime: row.check_out_time ? new Date(row.check_out_time) : undefined,
       status: row.status as AttendeeStatus,
       qrCode: row.qr_code,
-      sponsorBoothVisits: row.sponsor_booth_visits ? JSON.parse(row.sponsor_booth_visits) : [],
+      sponsorBoothVisits,
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at)
     };

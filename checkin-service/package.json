@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "check:db": "node scripts/check-database.js"
   },
   "keywords": ["event-management", "checkin", "microservice", "clean-architecture"],
   "author": "Eventix Team",
