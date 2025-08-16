@@ -103,15 +103,33 @@ INSERT INTO users (id, email, password_hash, role, first_name, last_name) VALUES
     ('550e8400-e29b-41d4-a716-446655440002', 'sponsor@eventix.com', '$2b$10$example.hash', 'SPONSOR', 'Sponsor', 'User'),
     ('550e8400-e29b-41d4-a716-446655440003', 'staff@eventix.com', '$2b$10$example.hash', 'STAFF', 'Staff', 'User');
 
--- Insert sample event
+-- Insert sample events
 INSERT INTO events (id, name, description, start_date, end_date, location, max_attendees, organizer_id) VALUES
     ('550e8400-e29b-41d4-a716-446655440000', 'FU Business Seminar 2024', 'Annual business seminar for FU students', 
      '2024-03-15 09:00:00', '2024-03-15 17:00:00', 'FU Main Campus', 500, 
-     '550e8400-e29b-41d4-a716-446655440001');
+     '550e8400-e29b-41d4-a716-446655440001'),
+    ('550e8400-e29b-41d4-a716-446655440100', 'UTH Tech Innovation Conference 2024', 'Hoi nghi Cong nghe va Doi moi Sang tao - Truong Dai hoc Giao thong Van tai TP.HCM', 
+     '2024-04-20 08:30:00', '2024-04-20 17:30:00', 'UTH Campus - Auditorium A', 300, 
+     '550e8400-e29b-41d4-a716-446655440001'),
+    ('550e8400-e29b-41d4-a716-446655440101', 'UTH Career Fair 2024', 'Ngay hoi viec lam - Ket noi sinh vien UTH voi doanh nghiep', 
+     '2024-05-10 09:00:00', '2024-05-10 16:00:00', 'UTH Campus - Main Hall', 800, 
+     '550e8400-e29b-41d4-a716-446655440002');
 
 -- Insert sample attendees for testing
 INSERT INTO attendees (id, event_id, user_id, ticket_id, status, qr_code) VALUES
+    -- FU Business Seminar attendees
     ('550e8400-e29b-41d4-a716-446655440010', '550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440020', 'REGISTERED', 'event-demo-2024:attendee-123'),
     ('550e8400-e29b-41d4-a716-446655440011', '550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440021', 'REGISTERED', 'event-demo-2024:john-doe'),
     ('550e8400-e29b-41d4-a716-446655440012', '550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440022', 'REGISTERED', 'event-demo-2024:jane-smith'),
-    ('550e8400-e29b-41d4-a716-446655440013', '550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440023', 'CHECKED_IN', 'event-demo-2024:mike-johnson');
+    ('550e8400-e29b-41d4-a716-446655440013', '550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440023', 'CHECKED_IN', 'event-demo-2024:mike-johnson'),
+    
+    -- UTH Tech Innovation Conference attendees
+    ('550e8400-e29b-41d4-a716-446655440030', '550e8400-e29b-41d4-a716-446655440100', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440040', 'REGISTERED', 'uth-tech-2024:nguyen-van-a'),
+    ('550e8400-e29b-41d4-a716-446655440031', '550e8400-e29b-41d4-a716-446655440100', '550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440041', 'REGISTERED', 'uth-tech-2024:tran-thi-b'),
+    ('550e8400-e29b-41d4-a716-446655440032', '550e8400-e29b-41d4-a716-446655440100', '550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440042', 'CHECKED_IN', 'uth-tech-2024:le-minh-c'),
+    
+    -- UTH Career Fair attendees
+    ('550e8400-e29b-41d4-a716-446655440050', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440060', 'REGISTERED', 'uth-career-2024:pham-duc-d'),
+    ('550e8400-e29b-41d4-a716-446655440051', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440061', 'REGISTERED', 'uth-career-2024:hoang-thi-e'),
+    ('550e8400-e29b-41d4-a716-446655440052', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440062', 'REGISTERED', 'uth-career-2024:vo-van-f'),
+    ('550e8400-e29b-41d4-a716-446655440053', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440063', 'CHECKED_IN', 'uth-career-2024:dao-minh-g');

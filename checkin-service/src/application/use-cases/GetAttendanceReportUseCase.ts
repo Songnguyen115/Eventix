@@ -16,6 +16,18 @@ export interface AttendanceReport {
   checkInRate: number;
   attendanceByHour: AttendanceByHour[];
   statusBreakdown: StatusBreakdown[];
+  attendees: AttendeeInfo[];
+  generatedAt: Date;
+}
+
+export interface AttendeeInfo {
+  id: string;
+  userId: string;
+  qrCode: string;
+  status: AttendeeStatus;
+  checkInTime?: Date;
+  checkOutTime?: Date;
+  createdAt: Date;
 }
 
 export interface AttendanceByHour {
@@ -62,6 +74,17 @@ export class GetAttendanceReportUseCase {
     // Status breakdown
     const statusBreakdown = this.getStatusBreakdown(attendees);
 
+    // Map attendees to simplified info
+    const attendeeInfo: AttendeeInfo[] = attendees.map(attendee => ({
+      id: attendee.id,
+      userId: attendee.userId,
+      qrCode: attendee.qrCode,
+      status: attendee.status,
+      checkInTime: attendee.checkInTime,
+      checkOutTime: attendee.checkOutTime,
+      createdAt: attendee.createdAt
+    }));
+
     return {
       eventId,
       totalRegistered,
@@ -70,7 +93,9 @@ export class GetAttendanceReportUseCase {
       totalCancelled,
       checkInRate: Math.round(checkInRate * 100) / 100,
       attendanceByHour,
-      statusBreakdown
+      statusBreakdown,
+      attendees: attendeeInfo,
+      generatedAt: new Date()
     };
   }
 

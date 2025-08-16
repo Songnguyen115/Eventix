@@ -13,6 +13,7 @@ import { SponsorBoothController } from './presentation/controllers/SponsorBoothC
 // Use Cases
 import { CheckInAttendeeUseCase } from './application/use-cases/CheckInAttendeeUseCase';
 import { GetAttendanceReportUseCase } from './application/use-cases/GetAttendanceReportUseCase';
+import { ValidateQrCodeUseCase } from './application/use-cases/ValidateQrCodeUseCase';
 import { ManageSponsorBoothUseCase } from './application/use-cases/ManageSponsorBoothUseCase';
 
 // Repositories
@@ -154,12 +155,14 @@ export class App {
     // Initialize use cases
     const checkInAttendeeUseCase = new CheckInAttendeeUseCase(attendeeRepository);
     const getAttendanceReportUseCase = new GetAttendanceReportUseCase(attendeeRepository);
+    const validateQrCodeUseCase = new ValidateQrCodeUseCase(attendeeRepository);
     const manageSponsorBoothUseCase = new ManageSponsorBoothUseCase(attendeeRepository as any);
 
     // Initialize controllers
     const checkInController = new CheckInController(
       checkInAttendeeUseCase,
-      getAttendanceReportUseCase
+      getAttendanceReportUseCase,
+      validateQrCodeUseCase
     );
     const sponsorBoothController = new SponsorBoothController(manageSponsorBoothUseCase);
 

@@ -4,7 +4,7 @@ import { ValidationError } from '../../domain/errors/ValidationError';
 
 export interface CheckInAttendeeRequest {
   qrCode: string;
-  eventId: string;
+  eventId?: string;
   checkedInBy: string; // staff ID
   location?: string;
 }
@@ -19,8 +19,8 @@ export class CheckInAttendeeUseCase {
 
   async execute(request: CheckInAttendeeRequest): Promise<CheckInAttendeeResponse> {
     // Validate input
-    if (!request.qrCode || !request.eventId || !request.checkedInBy) {
-      throw new ValidationError('Missing required fields: qrCode, eventId, checkedInBy');
+    if (!request.qrCode || !request.checkedInBy) {
+      throw new ValidationError('Missing required fields: qrCode, checkedInBy');
     }
 
     // Find attendee by QR code
@@ -29,14 +29,17 @@ export class CheckInAttendeeUseCase {
       throw new ValidationError('Invalid QR code or attendee not found');
     }
 
-    // Check if attendee is for the correct event
-    if (attendee.eventId !== request.eventId) {
+    // Check if attendee is for the correct event (if eventId provided)
+    if (request.eventId && attendee.eventId !== request.eventId) {
       throw new ValidationError('QR code is not valid for this event');
     }
 
     // Check if already checked in
     if (attendee.status === AttendeeStatus.CHECKED_IN) {
-      throw new ValidationError('Attendee is already checked in');
+      return {
+        attendee,
+        message: `Attendee ${attendee.userId} is already checked in at ${attendee.checkInTime?.toLocaleString()}`
+      };
     }
 
     // Check if cancelled
@@ -53,7 +56,7 @@ export class CheckInAttendeeUseCase {
 
     return {
       attendee: updatedAttendee,
-      message: `Successfully checked in ${updatedAttendee.userId}`
+      message: `Successfully checked in attendee ${updatedAttendee.userId} for event ${updatedAttendee.eventId}`
     };
   }
 }

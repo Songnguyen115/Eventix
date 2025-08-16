@@ -109,7 +109,7 @@ docker exec -i checkin-service-mysql-1 mysql -u eventix -ppassword eventix_check
 - `GET /health` - Kiểm tra trạng thái service
 
 ### Check-in Management
-- `POST /api/v1/checkin` - Check-in attendee với QR code
+- `POST /api/v1/checkin/checkin` - Check-in attendee với QR code
 - `GET /api/v1/checkin/validate-qr/:qrCode` - Validate QR code
 - `GET /api/v1/checkin/attendance/:eventId` - Lấy báo cáo tham dự
 
@@ -117,16 +117,16 @@ docker exec -i checkin-service-mysql-1 mysql -u eventix -ppassword eventix_check
 - `POST /api/v1/sponsor-booth` - Tạo gian hàng sponsor
 - `GET /api/v1/sponsor-booth/:boothId/visitors` - Lấy danh sách khách ghé thăm
 
-## 🧪 Testing API
+## 🧪 Testing
 
-### Sử dụng Postman hoặc curl
+### Sử dụng Postman
 
 ```bash
 # Health check
 curl http://localhost:3001/health
 
 # Check-in attendee
-curl -X POST http://localhost:3001/api/v1/checkin \
+curl -X POST http://localhost:3001/api/v1/checkin/checkin \
   -H "Content-Type: application/json" \
   -d '{
     "qrCode": "event-demo-2024:nguyen-van-a",

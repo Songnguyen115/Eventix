@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import { CheckInAttendeeUseCase } from '../../application/use-cases/CheckInAttendeeUseCase';
 import { GetAttendanceReportUseCase } from '../../application/use-cases/GetAttendanceReportUseCase';
+import { ValidateQrCodeUseCase } from '../../application/use-cases/ValidateQrCodeUseCase';
 import { ValidationError } from '../../domain/errors/ValidationError';
 import { NotFoundError } from '../../domain/errors/NotFoundError';
 
 export class CheckInController {
   constructor(
     private checkInAttendeeUseCase: CheckInAttendeeUseCase,
-    private getAttendanceReportUseCase: GetAttendanceReportUseCase
+    private getAttendanceReportUseCase: GetAttendanceReportUseCase,
+    private validateQrCodeUseCase: ValidateQrCodeUseCase
   ) {}
 
   async checkInAttendee(req: Request, res: Response): Promise<void> {
@@ -113,23 +115,29 @@ export class CheckInController {
         return;
       }
 
-      // This would typically use a separate use case
-      // For now, we'll return a simple response
+      // Use the validate QR code use case
+      const result = await this.validateQrCodeUseCase.execute({
+        qrCode,
+        eventId: eventId as string
+      });
+
       res.status(200).json({
         success: true,
-        data: {
-          qrCode,
-          eventId,
-          isValid: true,
-          message: 'QR Code is valid for this event'
-        }
+        data: result
       });
     } catch (error) {
-      console.error('QR Code validation error:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error'
-      });
+      if (error instanceof ValidationError || error instanceof NotFoundError) {
+        res.status(400).json({
+          success: false,
+          error: error.message
+        });
+      } else {
+        console.error('QR Code validation error:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Internal server error'
+        });
+      }
     }
   }
 }
