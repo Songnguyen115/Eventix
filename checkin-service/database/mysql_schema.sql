@@ -133,3 +133,193 @@ INSERT INTO attendees (id, event_id, user_id, ticket_id, status, qr_code) VALUES
     ('550e8400-e29b-41d4-a716-446655440051', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440061', 'REGISTERED', 'uth-career-2024:hoang-thi-e'),
     ('550e8400-e29b-41d4-a716-446655440052', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440062', 'REGISTERED', 'uth-career-2024:vo-van-f'),
     ('550e8400-e29b-41d4-a716-446655440053', '550e8400-e29b-41d4-a716-446655440101', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440063', 'CHECKED_IN', 'uth-career-2024:dao-minh-g');
+
+-- ===============================================================
+-- ANALYTICS SERVICE SCHEMA - Added for Analytics & Reporting
+-- ===============================================================
+
+-- Analytics Events Table - Tracks all analytics events
+CREATE TABLE analytics_events (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    event_id VARCHAR(36) NOT NULL,
+    event_type ENUM('PAGE_VIEW', 'BUTTON_CLICK', 'FORM_SUBMIT', 'API_CALL', 'ERROR', 'CHECK_IN', 'CHECK_OUT', 'SPONSOR_VISIT') NOT NULL,
+    user_id VARCHAR(36),
+    attendee_id VARCHAR(36),
+    session_id VARCHAR(36),
+    metadata JSON,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_event_id (event_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_attendee_id (attendee_id),
+    INDEX idx_timestamp (timestamp),
+    INDEX idx_event_type (event_type),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (attendee_id) REFERENCES attendees(id) ON DELETE SET NULL
+);
+
+-- Dashboard Metrics Table - Stores pre-calculated metrics for dashboard
+CREATE TABLE dashboard_metrics (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value DECIMAL(15,2) NOT NULL,
+    metric_unit VARCHAR(50),
+    event_id VARCHAR(36),
+    category VARCHAR(100),
+    period VARCHAR(50), -- daily, weekly, monthly, yearly
+    period_start TIMESTAMP,
+    period_end TIMESTAMP,
+    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_metric_name (metric_name),
+    INDEX idx_event_id (event_id),
+    INDEX idx_period (period),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+-- Reports Table - Stores generated reports
+CREATE TABLE reports (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    report_name VARCHAR(200) NOT NULL,
+    report_type ENUM('ATTENDANCE', 'REVENUE', 'SURVEY', 'SPONSOR', 'CUSTOM', 'CHECK_IN_SUMMARY', 'EVENT_ANALYTICS') NOT NULL,
+    event_id VARCHAR(36),
+    generated_by VARCHAR(36),
+    file_path VARCHAR(500),
+    report_data JSON,
+    status ENUM('PENDING', 'GENERATING', 'COMPLETED', 'FAILED') DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+    INDEX idx_report_type (report_type),
+    INDEX idx_event_id (event_id),
+    INDEX idx_status (status),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (generated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Surveys Table - Manages surveys for events
+CREATE TABLE surveys (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    event_id VARCHAR(36),
+    created_by VARCHAR(36),
+    survey_type ENUM('FEEDBACK', 'EVALUATION', 'SATISFACTION', 'CUSTOM') DEFAULT 'FEEDBACK',
+    distribution_type ENUM('EMAIL', 'ATTENDEE', 'USER') DEFAULT 'ATTENDEE',
+    is_active BOOLEAN DEFAULT TRUE,
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_event_id (event_id),
+    INDEX idx_is_active (is_active),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Survey Questions Table
+CREATE TABLE survey_questions (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    survey_id VARCHAR(36) NOT NULL,
+    question_text TEXT NOT NULL,
+    question_type ENUM('MULTIPLE_CHOICE', 'SINGLE_CHOICE', 'TEXT', 'RATING', 'SCALE') NOT NULL,
+    options JSON, -- For multiple choice questions
+    is_required BOOLEAN DEFAULT FALSE,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_survey_id (survey_id),
+    INDEX idx_display_order (display_order),
+    FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+);
+
+-- Survey Responses Table
+CREATE TABLE survey_responses (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    survey_id VARCHAR(36) NOT NULL,
+    question_id VARCHAR(36) NOT NULL,
+    attendee_id VARCHAR(36),
+    user_id VARCHAR(36),
+    response_value TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_survey_id (survey_id),
+    INDEX idx_question_id (question_id),
+    INDEX idx_attendee_id (attendee_id),
+    FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES survey_questions(id) ON DELETE CASCADE,
+    FOREIGN KEY (attendee_id) REFERENCES attendees(id) ON DELETE SET NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Survey Distribution Table - Tracks survey distribution
+CREATE TABLE survey_distribution (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    survey_id VARCHAR(36) NOT NULL,
+    target_type ENUM('EMAIL', 'ATTENDEE', 'USER') NOT NULL,
+    target_id VARCHAR(36), -- attendee_id or user_id
+    email VARCHAR(255),
+    status ENUM('PENDING', 'SENT', 'OPENED', 'RESPONDED', 'FAILED') DEFAULT 'PENDING',
+    sent_at TIMESTAMP,
+    opened_at TIMESTAMP,
+    responded_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_survey_id (survey_id),
+    INDEX idx_target_type (target_type),
+    INDEX idx_status (status),
+    FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+);
+
+-- Event Analytics Summary Table - Pre-calculated analytics for events
+CREATE TABLE event_analytics_summary (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    event_id VARCHAR(36) NOT NULL UNIQUE,
+    total_registrations INT DEFAULT 0,
+    total_checkins INT DEFAULT 0,
+    total_checkouts INT DEFAULT 0,
+    checkin_rate DECIMAL(5,2) DEFAULT 0.00, -- percentage
+    total_revenue DECIMAL(15,2) DEFAULT 0.00,
+    average_rating DECIMAL(3,2) DEFAULT 0.00,
+    total_survey_responses INT DEFAULT 0,
+    sponsor_booth_visits INT DEFAULT 0,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_event_id (event_id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+-- Create views for common analytics queries
+CREATE VIEW daily_check_in_metrics AS
+SELECT 
+    DATE(check_in_time) as date,
+    event_id,
+    COUNT(*) as total_checkins,
+    COUNT(DISTINCT user_id) as unique_attendees
+FROM attendees 
+WHERE check_in_time IS NOT NULL
+GROUP BY DATE(check_in_time), event_id;
+
+CREATE VIEW event_performance_summary AS
+SELECT 
+    e.id as event_id,
+    e.name as event_name,
+    e.max_attendees,
+    COUNT(a.id) as total_registrations,
+    COUNT(CASE WHEN a.status = 'CHECKED_IN' THEN 1 END) as total_checkins,
+    ROUND((COUNT(CASE WHEN a.status = 'CHECKED_IN' THEN 1 END) / COUNT(a.id)) * 100, 2) as checkin_rate
+FROM events e
+LEFT JOIN attendees a ON e.id = a.event_id
+GROUP BY e.id, e.name, e.max_attendees;
+
+-- Insert sample analytics data
+INSERT INTO analytics_events (id, event_id, event_type, user_id, attendee_id, metadata) VALUES
+('analytics-001', '550e8400-e29b-41d4-a716-446655440000', 'CHECK_IN', '550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440013', '{"location": "entrance", "scanner_id": "scan-01"}'),
+('analytics-002', '550e8400-e29b-41d4-a716-446655440100', 'PAGE_VIEW', '550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440032', '{"page": "event-dashboard", "user_agent": "Chrome"}'),
+('analytics-003', '550e8400-e29b-41d4-a716-446655440101', 'SPONSOR_VISIT', '550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440053', '{"sponsor": "TechCorp", "booth_id": "booth-01"}');
+
+-- Insert sample dashboard metrics
+INSERT INTO dashboard_metrics (id, metric_name, metric_value, metric_unit, event_id, category, period) VALUES
+('metric-001', 'Total Check-ins', 150, 'count', '550e8400-e29b-41d4-a716-446655440000', 'attendance', 'daily'),
+('metric-002', 'Average Rating', 4.5, 'rating', '550e8400-e29b-41d4-a716-446655440100', 'feedback', 'weekly'),
+('metric-003', 'Revenue Generated', 25000.00, 'VND', '550e8400-e29b-41d4-a716-446655440101', 'financial', 'monthly');
+
+-- Insert sample event analytics summary
+INSERT INTO event_analytics_summary (id, event_id, total_registrations, total_checkins, checkin_rate, total_revenue, average_rating) VALUES
+('summary-001', '550e8400-e29b-41d4-a716-446655440000', 4, 1, 25.00, 0.00, 4.5),
+('summary-002', '550e8400-e29b-41d4-a716-446655440100', 3, 1, 33.33, 0.00, 4.8),
+('summary-003', '550e8400-e29b-41d4-a716-446655440101', 4, 1, 25.00, 0.00, 4.2);

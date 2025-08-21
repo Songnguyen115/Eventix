@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  analytics-service:
+    build: .
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_NAME=eventix_analytics
+      - DB_USER=eventix
+      - DB_PASSWORD=password
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=host.docker.internal
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=eventix
+      - RABBITMQ_PASS=password
+      - JWT_SECRET=your-super-secret-jwt-key-development
+      - API_VERSION=v1
+    volumes:
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+    restart: unless-stopped

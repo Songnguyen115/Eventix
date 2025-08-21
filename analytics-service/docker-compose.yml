@@ -1,0 +1,66 @@
+services:
+  analytics-service:
+    build: .
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=eventix_checkin
+      - DB_USER=eventix
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=eventix
+      - RABBITMQ_PASS=password
+      - JWT_SECRET=your-super-secret-jwt-key-development
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASS=your-app-password
+    depends_on:
+      - redis
+      - rabbitmq
+    volumes:
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+    networks:
+      - eventix-network
+
+  # MySQL sẽ được sử dụng từ Checkin Service
+  # Không cần tạo MySQL container riêng
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_analytics_data:/data
+    networks:
+      - eventix-network
+
+  # Message Broker for inter-service communication
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=eventix
+      - RABBITMQ_DEFAULT_PASS=password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - eventix-network
+
+volumes:
+  redis_analytics_data:
+  rabbitmq_data:
+
+networks:
+  eventix-network:
+    driver: bridge

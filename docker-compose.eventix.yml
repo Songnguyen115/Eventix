@@ -1,0 +1,138 @@
+# Eventix Full System Docker Compose
+# Chạy tất cả services: Checkin Service + Analytics Service + Database
+version: '3.8'
+
+services:
+  # Checkin Service
+  checkin-service:
+    build: ./checkin-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=eventix_checkin
+      - DB_USER=eventix
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your-super-secret-jwt-key-development
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./checkin-service/logs:/app/logs
+    networks:
+      - eventix-network
+
+  # Analytics Service
+  analytics-service:
+    build: ./analytics-service
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=eventix_checkin
+      - DB_USER=eventix
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis-analytics
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=eventix
+      - RABBITMQ_PASS=password
+      - JWT_SECRET=your-super-secret-jwt-key-development
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASS=your-app-password
+    depends_on:
+      - mysql
+      - redis-analytics
+      - rabbitmq
+    volumes:
+      - ./analytics-service/logs:/app/logs
+      - ./analytics-service/reports:/app/reports
+    networks:
+      - eventix-network
+
+  # Shared MySQL Database
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=eventix_checkin
+      - MYSQL_USER=eventix
+      - MYSQL_PASSWORD=password
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_shared_data:/var/lib/mysql
+      - ./checkin-service/database/mysql_schema.sql:/docker-entrypoint-initdb.d/mysql_schema.sql
+    networks:
+      - eventix-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis for Checkin Service
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6378:6379"
+    volumes:
+      - redis_checkin_data:/data
+    networks:
+      - eventix-network
+
+  # Redis for Analytics Service
+  redis-analytics:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_analytics_data:/data
+    networks:
+      - eventix-network
+
+  # RabbitMQ for Analytics Service
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=eventix
+      - RABBITMQ_DEFAULT_PASS=password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - eventix-network
+
+  # MySQL Admin Interface
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=eventix
+      - PMA_PASSWORD=password
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - eventix-network
+
+volumes:
+  mysql_shared_data:
+  redis_checkin_data:
+  redis_analytics_data:
+  rabbitmq_data:
+
+networks:
+  eventix-network:
+    driver: bridge
