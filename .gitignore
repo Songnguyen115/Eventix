@@ -15,6 +15,10 @@ yarn-error.log*
 logs
 *.log
 
+# file backup của diagram
+*.bkp
+.$*
+
 # Runtime data
 pids
 *.pid
