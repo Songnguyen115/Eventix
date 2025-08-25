@@ -1,7 +1,7 @@
 # EVENT-CONTENTSERVICES - Event & Content Management System
 
 ## Overview
-Overview: Hệ thống quản lý sự kiện và nội dung sử dụng Spring Boot, cung cấp các API RESTful cho các thao tác CRUD và hỗ trợ tích hợp với MySQL hoặc H2 database.
+Eventix là hệ thống quản lý sự kiện với kiến trúc microservices, bao gồm hai thành phần chính: event service và contentservices
 
 ## Architecture
 - REST API Service: Quản lý sự kiện và nội dung (Spring Boot, Java)
@@ -35,14 +35,14 @@ Overview: Hệ thống quản lý sự kiện và nội dung sử dụng Spring 
 
 ### Installation
 ```bash
-# Clone repository: Tải mã nguồn về
+# Clone repository
 git clone <repository-url>
 cd EVENT-CONTENTSERVICES
 
-# Build the project: Biên dịch dự án
+# Build the project
 ./mvnw clean install
 
-# Run the application: Chạy ứng dụng
+# Run the application
 ./mvnw spring-boot:run
 ```
 
@@ -54,24 +54,24 @@ cd EVENT-CONTENTSERVICES
 
 ### Event APIs
 ```
-GET    /api/events: Lấy danh sách sự kiện
-POST   /api/events: Thêm sự kiện mới
-GET    /api/events/{id}: Lấy thông tin sự kiện theo ID
-PUT    /api/events/{id}: Cập nhật sự kiện
-DELETE /api/events/{id}: Xóa sự kiện
+GET    /api/events
+POST   /api/events
+GET    /api/events/{id}
+PUT    /api/events/{id}
+DELETE /api/events/{id}
 ```
 
 ### Content APIs
 ```
-GET    /api/content: Lấy danh sách nội dung
-POST   /api/content: Thêm nội dung mới
-GET    /api/content/{id}: Lấy thông tin nội dung theo ID
-PUT    /api/content/{id}: Cập nhật nội dung
-DELETE /api/content/{id}: Xóa nội dung
+GET    /api/content
+POST   /api/content
+GET    /api/content/{id}
+PUT    /api/content/{id}
+DELETE /api/content/{id}
 ```
 
 ## Database Configuration
-Database Configuration: Mặc định sử dụng H2.  
+Database Configuration 
 Để chuyển sang MySQL, sửa file `src/main/resources/application.properties`:
 ```
 spring.datasource.url=jdbc:mysql://localhost:3306/<your_db>
@@ -101,20 +101,20 @@ EVENT-CONTENTSERVICES/
 ## Development
 
 ### Adding New Features
-1. Follow Clean Architecture and Spring best practices: Tuân thủ kiến trúc sạch và chuẩn Spring
-2. Add proper error handling and validation: Xử lý lỗi và kiểm tra dữ liệu đầu vào
-3. Include unit tests: Thêm unit test
-4. Update API documentation (Swagger): Cập nhật tài liệu API
+1. Follow Clean Architecture and Spring best practices
+2. Add proper error handling and validation
+3. Include unit tests
+4. Update API documentation (Swagger)
 
 ## Contributing
-1. Fork the repository: Tạo bản sao dự án
-2. Create a feature branch: Tạo nhánh mới cho tính năng
-3. Commit your changes: Commit thay đổi
-4. Push to your branch: Đẩy lên nhánh của bạn
-5. Create a Pull Request: Tạo Pull Request
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to your branch
+5. Create a Pull Request
 
 ## License
-License: Dự án phục vụ mục đích học tập.
+This project is for educational purposes.
 
 ## Contact
-Contact: Nếu có câu hỏi hoặc cần hỗ trợ, vui lòng liên hệ nhóm
+For questions and support, please contact the development team.
