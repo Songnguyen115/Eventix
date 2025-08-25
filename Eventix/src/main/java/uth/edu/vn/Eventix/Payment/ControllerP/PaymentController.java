@@ -17,7 +17,7 @@ public class PaymentController {
 
    @PostMapping("/process")
 public ResponseEntity<PaymentResponse> processPayment(@RequestBody PaymentRequest request) throws Exception {
-    return ResponseEntity.ok(paymentService.bookPayment(request));
+    return ResponseEntity.ok(paymentService.processPayment(request));
 }
 
 }

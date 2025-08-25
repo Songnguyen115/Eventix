@@ -4,5 +4,5 @@ import uth.edu.vn.Eventix.Payment.DtoP.PaymentRequest;
 import uth.edu.vn.Eventix.Payment.DtoP.PaymentResponse;
 
 public interface PaymentService {
-    PaymentResponse bookPayment(PaymentRequest request) throws Exception;
+    PaymentResponse processPayment(PaymentRequest request) throws Exception;
 }

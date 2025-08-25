@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  sql1:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql1
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Aa123456"
+      ACCEPT_EULA: "Y"
+    networks:
+      - eventix-net
+
+  eventix:
+    build: .
+    container_name: eventix
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sql1
+    networks:
+      - eventix-net
+
+networks:
+  eventix-net:
+    driver: bridge

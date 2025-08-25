@@ -19,12 +19,12 @@ public class Payment {
     private Long paymentId;   
 
     
-    @OneToOne(optional=false, fetch = FetchType.LAZY)
-    @JoinColumn(name="ticket_id", unique = true)
+    @OneToOne
+    @JoinColumn(name = "ticket_id", referencedColumnName = "id")
     private Ticket ticketId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+    // @Column(nullable=false)
     private PaymentMethod method;
 
     @Column(nullable=false, precision = 18, scale = 2)
@@ -35,7 +35,7 @@ public class Payment {
     private PaymentStatus status;
 
     private String transactionRef;   // mã giao dịch từ cổng thanh toán
-    private String invoicePath;      // file hóa đơn (stub)
+    // private String invoicePath;      // file hóa đơn (stub)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
