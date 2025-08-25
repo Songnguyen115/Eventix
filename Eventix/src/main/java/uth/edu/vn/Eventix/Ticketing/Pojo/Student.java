@@ -26,36 +26,36 @@ public class Student {
     private LocalDateTime AcountCreationTime;
 
     // Getters and Setters
-    // public Long getId() {
-    //     return StudentId;
-    // }
+    public Long getId() {
+        return StudentId;
+    }
 
-    // public void setId(Long id) {
-    //     this.StudentId = id;
-    // }
+    public void setId(Long id) {
+        this.StudentId = id;
+    }
 
-    // public String getName() {
-    //     return StudentName;
-    // }
+    public String getName() {
+        return StudentName;
+    }
 
-    // public void setName(String name) {
-    //     this.StudentName = name;
-    // }
+    public void setName(String name) {
+        this.StudentName = name;
+    }
 
-    // public String getEmail() {
-    //     return StudentEmail;
-    // }
+    public String getEmail() {
+        return StudentEmail;
+    }
 
-    // public void setEmail(String email) {
-    //     this.StudentEmail = email;
-    // }
+    public void setEmail(String studentEmail) {
+        this.StudentEmail = studentEmail;
+    }
 
-    // public String getPhoneNumber() {
-    //     return PhoneNumber;
-    // }
+    public String getPhoneNumber() {
+        return PhoneNumber;
+    }
 
-    // public void setPhoneNumber(String phonenumber) {
-    //     this.PhoneNumber = phonenumber;
-    // }
+    public void setPhoneNumber(String phonenumber) {
+        this.PhoneNumber = phonenumber;
+    }
 
 }

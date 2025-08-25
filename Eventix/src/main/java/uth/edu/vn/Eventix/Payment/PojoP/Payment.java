@@ -21,7 +21,7 @@ public class Payment {
     
     @OneToOne(optional=false, fetch = FetchType.LAZY)
     @JoinColumn(name="ticket_id", unique = true)
-    private Ticket ticket;
+    private Ticket ticketId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)

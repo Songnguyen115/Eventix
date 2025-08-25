@@ -1,7 +1,10 @@
 
 package uth.edu.vn.Eventix.Ticketing.Service.Impl;
 
+// import lombok.Getter;
+// import lombok.Setter;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,9 +47,9 @@ public class TicketServiceImpl implements TicketService {
     // Tìm/tạo student theo email
     Student student = studentRepo.findByEmail(request.studentEmail())
         .orElseGet(() -> studentRepo.save(Student.builder()
-          .name(request.studentName())
-          .email(request.studentEmail())
-          .accountCreationTime(LocalDateTime.now())
+          .StudentName(request.studentName())
+          .StudentEmail(request.studentEmail())
+          .AcountCreationTime(LocalDateTime.now())
           .build()));
 
     // Chuẩn bị thư mục QR
@@ -59,8 +62,8 @@ public class TicketServiceImpl implements TicketService {
         .seminar(seminar)
         .student(student)
         .qrCodeContent(qrContent)
-        .qrCodePath(qrPath)
-        .active(true)
+        .QRCodePath(qrPath)
+        .isActive(true)
         .createdAt(LocalDateTime.now())
         .build();
 

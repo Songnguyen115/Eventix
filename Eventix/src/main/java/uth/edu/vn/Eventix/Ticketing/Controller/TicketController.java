@@ -1,4 +1,3 @@
-// ticketing/controller/TicketController.java
 package uth.edu.vn.Eventix.Ticketing.Controller;
 
 import jakarta.validation.Valid;

@@ -1,14 +1,9 @@
 package uth.edu.vn.Eventix.Ticketing.Dto;
 
-import lombok.*;
+import jakarta.validation.constraints.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class TicketRequest {
-    private String eventName;
-    private String studentName;
-    private int capacity;
-}
-
+public record TicketRequest(
+  @NotNull Long seminarId,
+  @NotBlank String studentName,
+  @Email @NotBlank String studentEmail
+) {}

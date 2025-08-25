@@ -25,4 +25,13 @@ public class Seminar {
 
     @Column(nullable=false)
     private int registeredCount =0; // số sinh viên đã đăng kí vào buổi hội thảo
+
+        // Custom getId method to match expected naming convention
+    public Long getId() {
+        return seminarId;
+    }
+    
+    public void setId(Long id) {
+        this.seminarId = id;
+    }
 }

@@ -29,11 +29,23 @@ public class Ticket {
     private String StudentName;
 
     private String QRCodePath;
-    private int Capacity;
-    
-    @Column(nullable = false)
-    private boolean isActive = true;
 
-    private LocalDateTime TicketCreationTime;
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isActive = true;
+    
     private String qrCodeContent; 
+    // thời gian tạo vé
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+         // Custom getId method to match expected naming convention
+    public Long getId() {
+        return TicketId;
+    }
+    
+    public void setId(Long id) {
+        this.TicketId = id;
+    }
+  
 }
