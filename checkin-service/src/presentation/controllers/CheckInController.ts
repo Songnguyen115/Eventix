@@ -82,9 +82,38 @@ export class CheckInController {
         endDate: end
       });
 
+      // Transform data to include user info for frontend compatibility
+      const attendeesWithUserInfo = report.attendees.map(attendee => {
+        // Mock user data based on user ID - in real app this would come from User service
+        const getUserInfo = (userId: string) => {
+          const userMap: { [key: string]: { userName: string; email: string } } = {
+            '550e8400-e29b-41d4-a716-446655440001': { userName: 'Admin User', email: 'admin@eventix.com' },
+            '550e8400-e29b-41d4-a716-446655440002': { userName: 'John Doe', email: 'john.doe@example.com' },
+            '550e8400-e29b-41d4-a716-446655440003': { userName: 'Jane Smith', email: 'jane.smith@example.com' }
+          };
+          return userMap[userId] || { userName: 'Unknown User', email: 'unknown@example.com' };
+        };
+
+        const userInfo = getUserInfo(attendee.userId);
+        
+        return {
+          id: attendee.id,
+          eventId: eventId,
+          eventName: 'FU Business Seminar 2024', // Would come from Event service
+          userId: attendee.userId,
+          userName: userInfo.userName,
+          email: userInfo.email,
+          ticketId: `ticket-${attendee.id}`,
+          checkInTime: attendee.checkInTime,
+          checkInMethod: attendee.checkInTime ? 'QR Code' : null,
+          status: attendee.status,
+          qrCode: attendee.qrCode
+        };
+      });
+
       res.status(200).json({
         success: true,
-        data: report
+        data: attendeesWithUserInfo
       });
     } catch (error) {
       if (error instanceof NotFoundError) {
