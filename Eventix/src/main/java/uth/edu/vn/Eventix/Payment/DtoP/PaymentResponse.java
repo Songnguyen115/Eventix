@@ -18,4 +18,7 @@ public class PaymentResponse {
     private String status;
     private String transactionRef;
     private LocalDateTime createdAt;
+
+    // ✅ Thêm field QR Code URL
+    private String qrCodeUrl;
 }

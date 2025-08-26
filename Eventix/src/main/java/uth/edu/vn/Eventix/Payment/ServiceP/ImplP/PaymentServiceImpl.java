@@ -1,8 +1,15 @@
 package uth.edu.vn.Eventix.Payment.ServiceP.ImplP;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import uth.edu.vn.Eventix.Payment.ConfigP.PaymentConfig;
 import uth.edu.vn.Eventix.Payment.DtoP.PaymentRequest;
 import uth.edu.vn.Eventix.Payment.DtoP.PaymentResponse;
 import uth.edu.vn.Eventix.Payment.PojoP.Payment;
@@ -15,20 +22,23 @@ import uth.edu.vn.Eventix.Payment.ServiceP.PaymentService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-
 public class PaymentServiceImpl implements PaymentService {
-        private final PaymentRepository paymentRepository;
+
+    private final PaymentRepository paymentRepository;
     private final TicketRepository ticketRepository;
+    private final PaymentConfig paymentConfig;
 
     @Override
     public PaymentResponse processPayment(PaymentRequest request) throws Exception {
         // lấy ticket từ DB
-        Long ticketId = request.getTicketId();
         Ticket ticket = ticketRepository.findById(request.getTicketId())
-                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + request.getTicketId()));
 
         //   // kiểm tra còn slot không, test bên seminar
         // if (ticket.getRegisteredCount() >= ticket.getCapacity()) {
@@ -39,20 +49,69 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = Payment.builder()
                 .ticketId(ticket) // mapping đúng @OneToOne
                 .method(PaymentMethod.valueOf(request.getMethod().toUpperCase())) // convert String -> Enum
-                .amount(BigDecimal.valueOf(request.getAmount()))
-                .status(PaymentStatus.SUCCESS) // giả lập thành công
+                .amount(request.getAmount())
+                .status(PaymentStatus.SUCCESS) // mặc định thành công (cho CASH)
                 .transactionRef("TXN-" + System.currentTimeMillis()) // fake transaction ref
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        // xử lý call API MoMo
+        if ("MOMO".equalsIgnoreCase(request.getMethod())) {
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+
+                 Map<String, Object> requestBody = new HashMap<>();
+                requestBody.put("partnerCode", paymentConfig.getPartnerCode());
+                requestBody.put("accessKey", paymentConfig.getAccessKey());
+                requestBody.put("requestId", UUID.randomUUID().toString());
+                requestBody.put("amount", payment.getAmount().toString());
+                requestBody.put("orderId", UUID.randomUUID().toString());
+                requestBody.put("orderInfo", "Thanh toan ticket " + request.getTicketId());
+                requestBody.put("returnUrl", paymentConfig.getReturnUrl());
+                requestBody.put("notifyUrl", paymentConfig.getNotifyUrl());
+                requestBody.put("extraData", "");
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+                ResponseEntity<Map> response = restTemplate.postForEntity(paymentConfig.getEndpoint(), entity, Map.class);
+
+                String qrUrl = (String) response.getBody().get("payUrl");
+
+                payment.setStatus(PaymentStatus.PENDING); // chờ thanh toán
                 Payment savedPayment = paymentRepository.save(payment);
 
-                //bên seminar
-                // ticket.setRegisteredCount(ticket.getRegisteredCount() + 1);
-                // ticketRepository.save(ticket);
+                // trả về response DTO
+                return new PaymentResponse(
+                        savedPayment.getPaymentId(),
+                        savedPayment.getTicketId().getId(),
+                        savedPayment.getMethod().name(),
+                        savedPayment.getAmount(),
+                        savedPayment.getStatus().name(),
+                        savedPayment.getTransactionRef(),
+                        savedPayment.getCreatedAt(),
+                        qrUrl // thêm URL trả về từ MoMo
+                );
+            } catch (Exception e) {
+                return new PaymentResponse(
+                        null,
+                        ticketId,
+                        "MOMO",
+                        BigDecimal.ZERO,
+                        "ERROR",
+                        null,
+                        LocalDateTime.now(),
+                        null
+                );
+            }
+        }
 
-        // trả về response DTO
+        // giữ logic cũ cho CASH hoặc phương thức khác
+        payment.setStatus(PaymentStatus.SUCCESS);
+        Payment savedPayment = paymentRepository.save(payment);
+
         return new PaymentResponse(
                 savedPayment.getPaymentId(),
                 savedPayment.getTicketId().getId(),
@@ -60,8 +119,8 @@ public class PaymentServiceImpl implements PaymentService {
                 savedPayment.getAmount(),
                 savedPayment.getStatus().name(),
                 savedPayment.getTransactionRef(),
-                savedPayment.getCreatedAt()
+                savedPayment.getCreatedAt(),
+                null
         );
-}
-
+    }
 }

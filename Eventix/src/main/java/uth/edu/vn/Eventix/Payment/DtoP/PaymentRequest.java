@@ -1,10 +1,15 @@
 package uth.edu.vn.Eventix.Payment.DtoP;
 
-import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record PaymentRequest(
-  @NotNull Long seminarId,
-  @NotNull Long TicketId,
-  @NotBlank String qrCodePath,
-  @NotBlank String studentName
-) {}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PaymentRequest {
+    private Long ticketId;   // ID vé cần thanh toán
+    private String method;   // Ví dụ: VNPay, Momo, ZaloPay
+    private BigDecimal amount; // Số tiền thanh toán
+}
