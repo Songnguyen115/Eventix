@@ -1,7 +1,6 @@
 package uth.edu.vn.Eventix.Payment.ServiceP.ImplP;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +33,11 @@ public class PaymentServiceImpl implements PaymentService {
     private final TicketRepository ticketRepository;
     private final PaymentConfig paymentConfig;
 
+        public void printConfig() {
+        System.out.println("Partner Code: " + paymentConfig.getPartnerCode());
+        System.out.println("Endpoint: " + paymentConfig.getEndpoint());
+    }
+
     @Override
     public PaymentResponse processPayment(PaymentRequest request) throws Exception {
         // lấy ticket từ DB
@@ -47,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         // build payment
         Payment payment = Payment.builder()
-                .ticketId(ticket) // mapping đúng @OneToOne
+                .ticket(ticket)// mapping đúng @OneToOne
                 .method(PaymentMethod.valueOf(request.getMethod().toUpperCase())) // convert String -> Enum
                 .amount(request.getAmount())
                 .status(PaymentStatus.SUCCESS) // mặc định thành công (cho CASH)
@@ -86,18 +90,18 @@ public class PaymentServiceImpl implements PaymentService {
                 // trả về response DTO
                 return new PaymentResponse(
                         savedPayment.getPaymentId(),
-                        savedPayment.getTicketId().getId(),
+                        savedPayment.getTicket().getTicketId(),   
                         savedPayment.getMethod().name(),
                         savedPayment.getAmount(),
                         savedPayment.getStatus().name(),
                         savedPayment.getTransactionRef(),
                         savedPayment.getCreatedAt(),
-                        qrUrl // thêm URL trả về từ MoMo
+                        qrUrl // URL trả về từ MoMo
                 );
             } catch (Exception e) {
                 return new PaymentResponse(
                         null,
-                        ticketId,
+                        request.getTicketId(), // Sửa ở đây
                         "MOMO",
                         BigDecimal.ZERO,
                         "ERROR",
@@ -113,14 +117,15 @@ public class PaymentServiceImpl implements PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
 
         return new PaymentResponse(
-                savedPayment.getPaymentId(),
-                savedPayment.getTicketId().getId(),
-                savedPayment.getMethod().name(),
-                savedPayment.getAmount(),
-                savedPayment.getStatus().name(),
-                savedPayment.getTransactionRef(),
-                savedPayment.getCreatedAt(),
-                null
-        );
+        savedPayment.getPaymentId(),
+        savedPayment.getTicket().getTicketId(),  // sửa ở đây
+        savedPayment.getMethod().name(),
+        savedPayment.getAmount(),
+        savedPayment.getStatus().name(),
+        savedPayment.getTransactionRef(),
+        savedPayment.getCreatedAt(),
+        null
+);
+
     }
 }

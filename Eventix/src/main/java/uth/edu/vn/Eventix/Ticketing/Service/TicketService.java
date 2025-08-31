@@ -5,4 +5,5 @@ import uth.edu.vn.Eventix.Ticketing.Dto.TicketResponse;
 
 public interface TicketService {
     TicketResponse bookTicket(TicketRequest request) throws Exception;
+    // TicketResponse updateTicket(Long ticketId, TicketRequest request) throws Exception;
 }

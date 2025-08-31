@@ -1,4 +1,4 @@
-package uth.edu.vn.Eventix.Payment.UtilP;
+package uth.edu.vn.Eventix.Payment.Util;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

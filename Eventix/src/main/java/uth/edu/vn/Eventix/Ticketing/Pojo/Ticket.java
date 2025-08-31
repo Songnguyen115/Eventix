@@ -12,40 +12,32 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long TicketId;
+    private Long ticketId;
 
-    @ManyToOne(optional=false, fetch = FetchType.LAZY)
-    @JoinColumn(name="seminar_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "seminar_id")
     private Seminar seminar;
-    // private Long SeminarId;
-    private String SeminarName;
 
-    @ManyToOne(optional=false, fetch = FetchType.LAZY)
-    @JoinColumn(name="student_id")
+    private String seminarName;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id")
     private Student student;
-    // private Long StudentId;
-    private String StudentName;
 
-    private String QRCodePath;
+    private String studentName;
+
+    private String qrCodePath;
 
     @Column(nullable = false)
     @Builder.Default
     private boolean isActive = true;
-    
-    private String qrCodeContent; 
-    // thời gian tạo vé
+
+    private String qrCodeContent;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
-         // Custom getId method to match expected naming convention
-    public Long getId() {
-        return TicketId;
-    }
-    
-    public void setId(Long id) {
-        this.TicketId = id;
-    }
-  
+
 }

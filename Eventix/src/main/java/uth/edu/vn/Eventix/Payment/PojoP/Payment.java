@@ -19,9 +19,9 @@ public class Payment {
     private Long paymentId;   
 
     
-    @OneToOne
-    @JoinColumn(name = "ticket_id", referencedColumnName = "id")
-    private Ticket ticketId;
+ @ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name="ticket_id", referencedColumnName="TicketId")
+private Ticket ticket;
 
     @Enumerated(EnumType.STRING)
     // @Column(nullable=false)
