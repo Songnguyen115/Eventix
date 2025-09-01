@@ -18,6 +18,8 @@ import uth.edu.vn.Eventix.Ticketing.Service.TicketService;
 // import java.nio.file.Files;
 // import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +68,15 @@ public TicketResponse bookTicket(TicketRequest request) throws Exception {
 
     return new TicketResponse(ticket.getTicketId(), seminar.getSeminarId(), student.getStudentId(), qrPath);
 }
+
+    @Override
+    public Optional<Ticket> getTicketById(Long id) {
+        return ticketRepo.findById(id);
+    }
+
+    @Override
+    public List<Ticket> getAllTickets() {
+        return ticketRepo.findAll();
+    }
 
 }

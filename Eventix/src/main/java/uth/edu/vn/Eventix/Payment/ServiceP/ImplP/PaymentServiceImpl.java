@@ -16,13 +16,15 @@ import uth.edu.vn.Eventix.Payment.PojoP.PaymentMethod;
 import uth.edu.vn.Eventix.Payment.PojoP.PaymentStatus;
 import uth.edu.vn.Eventix.Payment.RepositoryP.PaymentRepository;
 import uth.edu.vn.Eventix.Ticketing.Pojo.Ticket;
-import uth.edu.vn.Eventix.Ticketing.Repository.TicketRepository; // cần để lấy Ticket
+import uth.edu.vn.Eventix.Ticketing.Repository.TicketRepository;
 import uth.edu.vn.Eventix.Payment.ServiceP.PaymentService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -127,5 +129,15 @@ public class PaymentServiceImpl implements PaymentService {
         null
 );
 
+    }
+
+    @Override
+    public List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
+    @Override
+    public Optional<Payment> getPaymentById(Long id) {
+        return paymentRepository.findById(id);
     }
 }

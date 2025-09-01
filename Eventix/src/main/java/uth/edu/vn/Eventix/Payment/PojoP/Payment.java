@@ -20,7 +20,7 @@ public class Payment {
 
     
  @ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name="ticket_id", referencedColumnName="TicketId")
+@JoinColumn(name="ticket_id", referencedColumnName="ticketId")
 private Ticket ticket;
 
     @Enumerated(EnumType.STRING)

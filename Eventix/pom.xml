@@ -142,7 +142,7 @@
 		<dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>11.2.3.jre17</version>
+            <version>12.4.2.jre21</version>
         </dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -175,6 +175,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<mainClass>uth.edu.vn.Eventix.EventixApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -183,6 +184,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 
