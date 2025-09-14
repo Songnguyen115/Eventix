@@ -2,7 +2,6 @@ package uth.edu.vn.notificationservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -10,17 +9,15 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
-@EnableRetry
-public class NotificationConfig {
-
-    @Bean("notificationExecutor")
+public class AsyncConfig {
+    @Bean(name = "notificationExecutorAsync")
     public Executor notificationExecutor() {
-        ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
-        exec.setCorePoolSize(5);
-        exec.setMaxPoolSize(20);
-        exec.setQueueCapacity(200);
-        exec.setThreadNamePrefix("notif-");
-        exec.initialize();
-        return exec;
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("Notification-");
+        executor.initialize();
+        return executor;
     }
 }

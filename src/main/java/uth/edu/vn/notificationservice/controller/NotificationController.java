@@ -1,21 +1,25 @@
 package uth.edu.vn.notificationservice.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uth.edu.vn.notificationservice.dto.EventNotificationDTO;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import uth.edu.vn.notificationservice.dto.NotificationRequest;
 import uth.edu.vn.notificationservice.model.EventNotification;
 import uth.edu.vn.notificationservice.service.NotificationService;
 
 @RestController
-@RequestMapping("/notify")
+@RequestMapping("/api/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
 
-    @Autowired
-    private NotificationService service;
+    private final NotificationService service;
 
     @PostMapping
-    public EventNotification sendNotification(@RequestBody EventNotificationDTO dto) {
-        return service.createNotification(dto.getMessage());
+    public ResponseEntity<EventNotification> sendNotification(@RequestBody @Valid NotificationRequest req) {
+        EventNotification saved = service.createNotification(req);
+        return ResponseEntity.accepted().body(saved);
     }
 
     @GetMapping("/test")

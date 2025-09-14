@@ -1,13 +1,9 @@
 package uth.edu.vn.notificationservice.util;
 
-import org.springframework.stereotype.Component;
+import uth.edu.vn.notificationservice.dto.NotificationRequest;
 
-@Component
-public class NotificationSender {
+public interface NotificationSender {
+    String getChannel();
 
-    // Dummy sender, ghi log ra console
-    public void send(String message) {
-        System.out.println("[NotificationSender] Sending notification: " + message);
-        // Nếu muốn, có thể kết nối RabbitMQ, Kafka sau
-    }
+    void send(NotificationRequest request);
 }

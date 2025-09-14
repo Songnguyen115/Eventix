@@ -1,35 +1,30 @@
 package uth.edu.vn.notificationservice.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uth.edu.vn.notificationservice.exception.NotificationException;
+import uth.edu.vn.notificationservice.dto.NotificationRequest;
 import uth.edu.vn.notificationservice.model.EventNotification;
 import uth.edu.vn.notificationservice.repository.NotificationRepository;
-import uth.edu.vn.notificationservice.util.NotificationSender;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository repository;
+    private final NotificationRepository repository;
+    private final NotificationDispatcher dispatcher;
 
-    @Autowired
-    private NotificationSender sender;
-
-    public EventNotification createNotification(String message) {
-        if (message == null || message.isEmpty()) {
-            throw new NotificationException("Message cannot be empty");
-        }
-
-        EventNotification notification = EventNotification.builder()
-                .message(message)
+    public EventNotification createNotification(NotificationRequest req) {
+        // Lưu DB
+        EventNotification entity = EventNotification.builder()
+                .channel(req.getChannel()) // channel là String
+                .recipient(req.getEmail()) // hoặc req.getPhoneNumber() nếu là SMS
+                .message(req.getMessage())
                 .build();
+        repository.save(entity);
 
-        EventNotification saved = repository.save(notification);
+        // Dispatch
+        dispatcher.dispatch(req.getChannel(), req);
 
-        // Gửi notification
-        sender.send(message);
-
-        return saved;
+        return entity;
     }
 }
