@@ -1,0 +1,16 @@
+uth\edu\vn\identityservice\exception\GlobalExceptionHandler.class
+uth\edu\vn\identityservice\security\JwtService.class
+uth\edu\vn\identityservice\model\User.class
+uth\edu\vn\identityservice\service\AuthService.class
+uth\edu\vn\identityservice\config\SecurityConfig.class
+uth\edu\vn\identityservice\App.class
+uth\edu\vn\identityservice\dto\JwtResponse.class
+uth\edu\vn\identityservice\exception\CustomException.class
+uth\edu\vn\identityservice\IdentityServiceApplication.class
+uth\edu\vn\identityservice\controller\AuthController.class
+uth\edu\vn\identityservice\dto\LoginRequest.class
+uth\edu\vn\identityservice\model\User$UserBuilder.class
+uth\edu\vn\identityservice\util\PasswordUtil.class
+uth\edu\vn\identityservice\security\JwtAuthenticationFilter.class
+uth\edu\vn\identityservice\repository\UserRepository.class
+uth\edu\vn\identityservice\dto\RegisterRequest.class
